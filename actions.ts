@@ -105,7 +105,9 @@ function createPublishCommand(
   outDist: string,
   register: string | undefined
 ): string {
-  return `cd ${outDist} && npm${!register ? " " : ` ${register} `}publish`;
+  return `cd ${outDist} && npm${
+    !register ? " " : ` --registry=${register} `
+  }publish`;
 }
 
 function revoke(pkg: IPackage, path: string, block: string, version: string) {
