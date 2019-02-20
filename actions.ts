@@ -26,7 +26,7 @@ const DEFAULT_NAME = "package.json";
 export function run({
   debug: fakeAction = false,
   rc: rctokrn = false,
-  rcAdd: rcadd = 0,
+  add: rcadd = 0,
   whiteSpace: BLOCK = " ",
   rootPath: root = ".",
   outDist: out = "dist",
@@ -36,7 +36,7 @@ export function run({
 }: {
   debug?: boolean;
   rc?: boolean;
-  rcAdd?: number;
+  add?: number;
   whiteSpace?: string;
   outDist?: string;
   rootPath?: string;
@@ -48,10 +48,17 @@ export function run({
   const outDist = path.resolve(process.cwd(), out);
   const pkg: IPackage = require(`${rootPath}/${DEFAULT_NAME}`);
   const { version } = pkg;
+  const oldVersion = String(version);
   const [main, oldrc] = (version || "").split("-");
   let [, rc = "0"] = (oldrc || "").split(".");
   const rcNum = Number(rc) + Number(rcadd);
-  pkg.version = `${main}${!!rctokrn ? `-rc.${rcNum}` : ""}`;
+  if (!!rctokrn) {
+    pkg.version = `${main}-rc.${rcNum}`;
+  } else {
+    const [oneLev = "0", secLev = "0", ThrLev = "0"] = (main || "").split(".");
+    pkg.version = `${oneLev}.${secLev}.${(Number(ThrLev) || 0) +
+      Number(rcadd)}`;
+  }
   const final = save(pkg, `${rootPath}/${DEFAULT_NAME}`, BLOCK);
   const distFinal = save(pkg, `${outDist}/${DEFAULT_NAME}`, BLOCK, json =>
     !outTransform ? json : outTransform(json)
@@ -70,16 +77,15 @@ export function run({
     onStdOut("DEBUG: test stdout");
     onStdErr("DEBUG: test stderr");
     console.log(chalk.green("=============== END ================"));
+    revoke(pkg, `${rootPath}/${DEFAULT_NAME}`, BLOCK, oldVersion);
     return;
   }
+  console.log(`run --> ${chalk.yellow(`cd ${outDist} && npm publish`)}\n`);
   exec(
     `cd ${outDist} && npm publish`,
     (error: any, stdout: string, stderr: string) => {
       if (error) {
-        save(pkg, `${rootPath}/${DEFAULT_NAME}`, BLOCK, json => ({
-          ...json,
-          version: `${main}${!!rctokrn ? `-${oldrc}` : ""}`
-        }));
+        revoke(pkg, `${rootPath}/${DEFAULT_NAME}`, BLOCK, oldVersion);
         throw error;
       } else {
         onStdOut(stdout);
@@ -87,6 +93,13 @@ export function run({
       }
     }
   );
+}
+
+function revoke(pkg: IPackage, path: string, block: string, version: string) {
+  save(pkg, path, block, json => ({
+    ...json,
+    version
+  }));
 }
 
 function save(

@@ -1,9 +1,9 @@
 const { run } = require("./dist/index.js");
 
 run({
-  debug: true,
+  debug: false,
   rc: false,
-  rcAdd: 0,
+  add: 1,
   whiteSpace: "  ",
   rootPath: ".",
   outDist: "dist",
