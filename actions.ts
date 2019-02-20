@@ -30,6 +30,7 @@ export function run({
   whiteSpace: BLOCK = " ",
   rootPath: root = ".",
   outDist: out = "dist",
+  useYarn = false,
   register = undefined,
   outTransform = undefined,
   onStdOut = out => console.log(out || "no std output."),
@@ -41,6 +42,7 @@ export function run({
   whiteSpace?: string;
   outDist?: string;
   rootPath?: string;
+  useYarn?: boolean;
   register?: string;
   outTransform?: (json: IPackage) => IPackage;
   onStdOut?: (out: string) => void;
@@ -66,6 +68,8 @@ export function run({
     !outTransform ? json : outTransform(json)
   );
 
+  const command = createPublishCommand(outDist, register, useYarn);
+
   console.log(chalk.cyan(`${root}/${DEFAULT_NAME} --> \n`));
   console.log(chalk.greenBright(JSON.stringify(final, null, BLOCK)));
   console.log(chalk.blue(`\n${out}/${DEFAULT_NAME} --> \n`));
@@ -73,39 +77,31 @@ export function run({
 
   if (fakeAction) {
     console.log(chalk.green("===============DEBUG================"));
-    console.log(
-      `\ncommand -> [ ${chalk.yellow(
-        createPublishCommand(outDist, register)
-      )} ]\n`
-    );
+    console.log(`\ncommand -> [ ${chalk.yellow(command)} ]\n`);
     onStdOut("DEBUG: test stdout");
     onStdErr("DEBUG: test stderr");
     console.log(chalk.green("=============== END ================"));
     revoke(pkg, `${rootPath}/${DEFAULT_NAME}`, BLOCK, oldVersion);
     return;
   }
-  console.log(
-    `run --> ${chalk.yellow(createPublishCommand(outDist, register))}\n`
-  );
-  exec(
-    `cd ${outDist} && npm publish`,
-    (error: any, stdout: string, stderr: string) => {
-      if (error) {
-        revoke(pkg, `${rootPath}/${DEFAULT_NAME}`, BLOCK, oldVersion);
-        throw error;
-      } else {
-        onStdOut(stdout);
-        onStdErr(stderr);
-      }
+  console.log(`\nrun --> ${chalk.yellow(command)}\n`);
+  exec(command, (error: any, stdout: string, stderr: string) => {
+    if (error) {
+      revoke(pkg, `${rootPath}/${DEFAULT_NAME}`, BLOCK, oldVersion);
+      throw error;
+    } else {
+      onStdOut(stdout);
+      onStdErr(stderr);
     }
-  );
+  });
 }
 
 function createPublishCommand(
   outDist: string,
-  register: string | undefined
+  register?: string,
+  useYarn?: boolean
 ): string {
-  return `cd ${outDist} && npm${
+  return `cd ${outDist} && ${!useYarn ? "npm" : "yarn"}${
     !register ? " " : ` --registry=${register} `
   }publish`;
 }

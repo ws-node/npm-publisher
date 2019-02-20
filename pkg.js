@@ -7,5 +7,6 @@ run({
   whiteSpace: "  ",
   rootPath: ".",
   outDist: "dist",
+  useYarn: true,
   outTransform: undefined
 });
