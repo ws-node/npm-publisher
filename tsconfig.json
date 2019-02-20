@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["es2015", "es2016"],
+    "allowJs": false,
+    "checkJs": false,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "strict": true
+  },
+  "exclude": ["node_modules"]
+}
