@@ -30,6 +30,7 @@ export function run({
   whiteSpace: BLOCK = " ",
   rootPath: root = ".",
   outDist: out = "dist",
+  register = undefined,
   outTransform = undefined,
   onStdOut = out => console.log(out || "no std output."),
   onStdErr = out => console.log(out || "no std outerr.")
@@ -40,6 +41,7 @@ export function run({
   whiteSpace?: string;
   outDist?: string;
   rootPath?: string;
+  register?: string;
   outTransform?: (json: IPackage) => IPackage;
   onStdOut?: (out: string) => void;
   onStdErr?: (out: string) => void;
@@ -72,7 +74,9 @@ export function run({
   if (fakeAction) {
     console.log(chalk.green("===============DEBUG================"));
     console.log(
-      `\ncommand -> [${chalk.yellow(` cd ${outDist} && npm publish `)}]\n`
+      `\ncommand -> [ ${chalk.yellow(
+        createPublishCommand(outDist, register)
+      )} ]\n`
     );
     onStdOut("DEBUG: test stdout");
     onStdErr("DEBUG: test stderr");
@@ -80,7 +84,9 @@ export function run({
     revoke(pkg, `${rootPath}/${DEFAULT_NAME}`, BLOCK, oldVersion);
     return;
   }
-  console.log(`run --> ${chalk.yellow(`cd ${outDist} && npm publish`)}\n`);
+  console.log(
+    `run --> ${chalk.yellow(createPublishCommand(outDist, register))}\n`
+  );
   exec(
     `cd ${outDist} && npm publish`,
     (error: any, stdout: string, stderr: string) => {
@@ -93,6 +99,13 @@ export function run({
       }
     }
   );
+}
+
+function createPublishCommand(
+  outDist: string,
+  register: string | undefined
+): string {
+  return `cd ${outDist} && npm${!register ? " " : ` ${register} `}publish`;
 }
 
 function revoke(pkg: IPackage, path: string, block: string, version: string) {
