@@ -2,6 +2,7 @@
   "compileOnSave": true,
   "compilerOptions": {
     "target": "es6",
+    "module": "commonjs",
     "lib": ["es2015", "es2016"],
     "allowJs": false,
     "checkJs": false,

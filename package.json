@@ -2,12 +2,15 @@
   "name": "@bigmogician/publisher",
   "version": "1.0.0",
   "main": "index.js",
+  "types": "index.d.ts",
   "repository": "https://github.com/ws-node/npm-publisher.git",
   "author": "mogician",
   "license": "MIT",
   "private": false,
   "devDependencies": {
+    "@types/chalk": "^2.2.0",
     "@types/node": "^11.9.4",
+    "chalk": "^2.4.2",
     "tslint": "^5.12.1",
     "typescript": "^3.3.3"
   }
