@@ -4,6 +4,7 @@ import { IConfig, run } from "../actions";
 
 const NAME = "publish";
 const DF_NAME = "pkg.config.js";
+const DF_CWD = process.cwd();
 
 cmd.name(NAME);
 cmd.description("fuck npm publish.");
@@ -21,12 +22,12 @@ cmd
       if (name !== NAME) return;
       let defaultConfig: IConfig = {};
       try {
-        defaultConfig = require(path.resolve(process.cwd(), CNAME || DF_NAME));
+        defaultConfig = require(path.resolve(DF_CWD, CNAME || DF_NAME));
       } catch (error) {
         /** ignore */
         console.debug(
           `[bmpub publish] -> config file [${path.resolve(
-            process.cwd(),
+            DF_CWD,
             CNAME || DF_NAME
           )}] not found.`
         );
@@ -37,8 +38,8 @@ cmd
         debug: debug || defaultConfig.debug,
         rc: rc || defaultConfig.rc,
         add: add || defaultConfig.add,
-        rootPath: root || defaultConfig.rootPath,
-        outDist: out || defaultConfig.outDist
+        rootPath: path.resolve(DF_CWD, root || defaultConfig.rootPath || "."),
+        outDist: path.resolve(DF_CWD, out || defaultConfig.outDist || "dist")
       };
       run(config);
     }
