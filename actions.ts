@@ -21,6 +21,20 @@ interface IPackage {
   devDependencies?: { [key: string]: string };
 }
 
+export interface IConfig {
+  debug?: boolean;
+  rc?: boolean;
+  add?: number;
+  whiteSpace?: string;
+  outDist?: string;
+  rootPath?: string;
+  useYarn?: boolean;
+  register?: string;
+  outTransform?: (json: IPackage) => IPackage;
+  onStdOut?: (out: string) => void;
+  onStdErr?: (out: string) => void;
+}
+
 const DEFAULT_NAME = "package.json";
 
 export function run({
@@ -35,19 +49,7 @@ export function run({
   outTransform = undefined,
   onStdOut = out => console.log(out || "no std output."),
   onStdErr = out => console.log(out || "no std outerr.")
-}: {
-  debug?: boolean;
-  rc?: boolean;
-  add?: number;
-  whiteSpace?: string;
-  outDist?: string;
-  rootPath?: string;
-  useYarn?: boolean;
-  register?: string;
-  outTransform?: (json: IPackage) => IPackage;
-  onStdOut?: (out: string) => void;
-  onStdErr?: (out: string) => void;
-} = {}) {
+}: IConfig = {}) {
   const rootPath = path.resolve(process.cwd(), root);
   const outDist = path.resolve(process.cwd(), out);
   const pkg: IPackage = require(`${rootPath}/${DEFAULT_NAME}`);

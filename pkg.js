@@ -1,6 +1,4 @@
-const { run } = require("./dist/index.js");
-
-run({
+module.exports = {
   debug: false,
   rc: false,
   add: 1,
@@ -9,4 +7,4 @@ run({
   outDist: "dist",
   useYarn: true,
   outTransform: undefined
-});
+};
