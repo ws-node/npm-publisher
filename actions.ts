@@ -30,6 +30,7 @@ export interface IConfig {
   rootPath?: string;
   useYarn?: boolean;
   register?: string;
+  useStamp?: boolean;
   outTransform?: (json: IPackage) => IPackage;
   onStdOut?: (out: string) => void;
   onStdErr?: (out: string) => void;
@@ -41,6 +42,7 @@ export function run({
   debug: fakeAction = false,
   rc: rctokrn = false,
   add: rcadd = 0,
+  useStamp = false,
   whiteSpace: BLOCK = " ",
   rootPath: root = ".",
   outDist: out = "dist",
@@ -57,7 +59,7 @@ export function run({
   const oldVersion = String(version);
   const [main, oldrc] = (version || "").split("-");
   let [, rc = "0"] = (oldrc || "").split(".");
-  const rcNum = Number(rc) + Number(rcadd);
+  const rcNum = !useStamp ? Number(rc) + Number(rcadd) : new Date().getTime();
   if (!!rctokrn) {
     pkg.version = `${main}-rc.${rcNum}`;
   } else {
