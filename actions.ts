@@ -34,6 +34,7 @@ export interface IConfig {
   outTransform?: (json: IPackage) => IPackage;
   onStdOut?: (out: string) => void;
   onStdErr?: (out: string) => void;
+  onDebugEnd?: (version: string) => void;
 }
 
 const DEFAULT_NAME = "package.json";
@@ -50,7 +51,8 @@ export function run({
   register = undefined,
   outTransform = undefined,
   onStdOut = out => console.log(out || "no std output."),
-  onStdErr = out => console.log(out || "no std outerr.")
+  onStdErr = out => console.log(out || "no std outerr."),
+  onDebugEnd = version => {}
 }: IConfig = {}) {
   const rootPath = path.resolve(process.cwd(), root);
   const outDist = path.resolve(process.cwd(), out);
@@ -86,6 +88,7 @@ export function run({
     onStdErr("DEBUG: test stderr");
     console.log(chalk.green("=============== END ================"));
     revoke(pkg, `${rootPath}/${DEFAULT_NAME}`, BLOCK, oldVersion);
+    onDebugEnd(pkg.version);
     return;
   }
   console.log(`\nrun --> ${chalk.yellow(command)}\n`);
