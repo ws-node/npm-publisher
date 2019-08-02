@@ -23,7 +23,7 @@ interface IPackage {
 
 export interface IConfig {
   debug?: boolean;
-  rc?: boolean;
+  rc?: boolean | string;
   add?: number;
   whiteSpace?: string;
   outDist?: string;
@@ -63,7 +63,7 @@ export function run({
   let [, rc = "0"] = (oldrc || "").split(".");
   const rcNum = !useStamp ? Number(rc) + Number(rcadd) : new Date().getTime();
   if (!!rctokrn) {
-    pkg.version = `${main}-rc.${rcNum}`;
+    pkg.version = `${main}-${rctokrn === true ? "rc" : rctokrn}.${rcNum}`;
   } else {
     const [oneLev = "0", secLev = "0", ThrLev = "0"] = (main || "").split(".");
     pkg.version = `${oneLev}.${secLev}.${(Number(ThrLev) || 0) +
